@@ -12,7 +12,18 @@
         @foreach ($paginator as $value)
             <tr id="tr{{ $value->id }}">
                 <th scope="row">{{ $value->id }}</th>
-                <td width="15%" class="img"><img src="{{ $value->getMiniImage() }}" alt=""></td>
+                <td width="15%" class="img">
+                    <div class="block-images">
+                        <div class="overlay" id="contenedor{{ $value->id }}">
+                            <div class="overlay_container">
+                                <a href="#close"><img src="{{ $value->getImage() }}"/></a>
+                            </div>
+                        </div>
+                        <a href="#contenedor{{ $value->id }}">
+                            <img src="{{ $value->getMiniImage() }}" id="image{{ $value->id }}" />
+                        </a>
+                    </div>
+                </td>
                 <td width="55%">
                     {{ $value->text }}
                     <br><small>создал: {{ $value->user->name }}</small>

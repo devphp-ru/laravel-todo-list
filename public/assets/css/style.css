@@ -1,3 +1,4 @@
+@charset "utf-8";
 /* Список c превью */
 .input-file-list {
     padding: 10px 0;
@@ -34,4 +35,30 @@
     text-align: center;
     line-height: 16px;
     border-radius: 50%;
+}
+
+.block-images {
+    position: relative;
+}
+.overlay{
+    display: none;
+    height: auto;
+    left: -15%;
+    position: absolute;
+    top: -50%;
+    width: auto;
+    z-index: 999;
+}
+.overlay .overlay_container{
+    display: table-cell;
+    vertical-align: middle;
+}
+.overlay_container img{
+    background-color: #AB5;
+    padding: 10px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+.overlay:target {
+    display: table;
 }
