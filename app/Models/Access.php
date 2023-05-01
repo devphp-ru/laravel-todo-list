@@ -22,6 +22,9 @@ class Access extends Model
 		'action',
 	];
 
+	/**
+	 * @return HasOne
+	 */
 	public function user(): HasOne
 	{
 		return $this->hasOne(User::class);

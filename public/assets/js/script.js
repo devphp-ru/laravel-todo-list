@@ -29,7 +29,7 @@ $(function () {
         $(`#form_todo #user_id`).val(userId);
         if (!isNaN(id) && (id > 0)) {
             $.ajax({
-                url: `/api/v1/todo/show/${id}`,
+                url: `${apiPath}/show/${id}`,
                 method: `GET`,
                 dataType: `json`,
                 cache: false,
@@ -61,7 +61,7 @@ $(function () {
         const id = parseInt($(this).data('id'));
         if (!isNaN(id) && (id > 0)) {
             $.ajax({
-                url: `/api/v1/todo/delete-image/${id}`,
+                url: `${apiPath}/delete-image/${id}`,
                 method: `DELETE`,
                 dataType: `json`,
                 success: function (data) {
@@ -143,8 +143,8 @@ $(function () {
 
     var $select = {};
     var control = {};
-    if ($("select").is(".js-select-add")) {
-        $("select.js-select-add").each(function (index) {
+    if ($('select').is('.js-select-add')) {
+        $('select.js-select-add').each(function (index) {
             var id = $(this).attr('id');
             $(this).removeClass('form-control');
             $select[id] = $('#' + id).selectize({
@@ -192,7 +192,7 @@ $(function () {
         if (!isNaN(id) && (id > 0)) {
             if (confirm('Удалить?')) {
                 $.ajax({
-                    url: apiPath + `/delete/${id}`,
+                    url: `${apiPath}/delete/${id}`,
                     method: `DELETE`,
                     cache: false,
                     data: {

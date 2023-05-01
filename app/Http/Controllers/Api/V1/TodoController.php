@@ -51,7 +51,7 @@ class TodoController extends Controller
 	public function paginateAjax(Request $request): ?string
 	{
 		if ($request->ajax()) {
-			$items = $this->service->getAllWithPaginate($request, 2, $request->input('current_user_id'));
+			$items = $this->service->getAllWithPaginate($request, TodoList::PER_PAGE, $request->input('current_user_id'));
 
 			return view('todolist.blocks._todo_lists', [
 				'paginator' => $items,
@@ -68,11 +68,11 @@ class TodoController extends Controller
 	 * @param StoreTodoListRequest $request
 	 * @return string
 	 */
-	public function store(StoreTodoListRequest $request)
+	public function store(StoreTodoListRequest $request): string
 	{
 		$this->service->create($request);
 
-		$items = $this->service->getAllWithPaginate($request, 2, $request->input('current_user_id'));
+		$items = $this->service->getAllWithPaginate($request, TodoList::PER_PAGE, $request->input('current_user_id'));
 
 		return view('todolist.blocks._todo_lists', [
 			'paginator' => $items,
@@ -87,11 +87,11 @@ class TodoController extends Controller
 	 * @param TodoList $todoList
 	 * @return string
 	 */
-	public function edit(UpdateTodoListRequest $request, TodoList $todoList)
+	public function edit(UpdateTodoListRequest $request, TodoList $todoList): string
 	{
 		$this->service->update($request, $todoList);
 
-		$items = $this->service->getAllWithPaginate($request, 2, $request->input('current_user_id'));
+		$items = $this->service->getAllWithPaginate($request, TodoList::PER_PAGE, $request->input('current_user_id'));
 
 		return view('todolist.blocks._todo_lists', [
 			'paginator' => $items,
@@ -116,7 +116,7 @@ class TodoController extends Controller
 			])->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
 		}
 
-		$items = $this->service->getAllWithPaginate($request, 2, $request->input('current_user_id'));
+		$items = $this->service->getAllWithPaginate($request, TodoList::PER_PAGE, $request->input('current_user_id'));
 
 		return view('todolist.blocks._todo_lists', [
 			'paginator' => $items,

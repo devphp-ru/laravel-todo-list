@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TodoList;
 use App\Services\TodoListService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +31,7 @@ class TodoListController extends Controller
 	 */
     public function index(Request $request): View
 	{
-		$items = $this->service->getAllWithPaginate($request, 2, Auth::user()->id);
+		$items = $this->service->getAllWithPaginate($request, TodoList::PER_PAGE, Auth::user()->id);
 		$users = $this->service->getUsersExceptId(Auth::user()->id);
 
 		$title = 'Список дел';

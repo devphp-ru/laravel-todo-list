@@ -84,9 +84,9 @@ class TodoListService implements Service
 	 * Создать модель в хранишище
 	 *
 	 * @param FormRequest $request
-	 * @return mixed
+	 * @return TodoList|null
 	 */
-	public function create(FormRequest $request)
+	public function create(FormRequest $request): ?TodoList
 	{
 		$request->offsetSet('image', Uploader::upload($request));
 
@@ -107,7 +107,7 @@ class TodoListService implements Service
 	 * @param TodoList $todoList
 	 * @return TodoList
 	 */
-	public function update(UpdateTodoListRequest $request, TodoList $todoList)
+	public function update(UpdateTodoListRequest $request, TodoList $todoList): TodoList
 	{
 		if ($request->has('file')) {
 			Uploader::remove($todoList);
@@ -150,7 +150,7 @@ class TodoListService implements Service
 	 * @param array $arrayTags
 	 * @param int $todoId
 	 */
-	private function makeTags(array $arrayTags, int $todoId)
+	private function makeTags(array $arrayTags, int $todoId): void
 	{
 		foreach ($arrayTags as $value) {
 			if (is_numeric($value)) {

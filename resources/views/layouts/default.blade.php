@@ -52,7 +52,6 @@
     @yield('content')
 </div>
 
-
 @auth
 <script>
     const currentUserId = @json(Auth::user()->id);

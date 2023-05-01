@@ -12,6 +12,8 @@ class TodoList extends Model
 {
     use HasFactory;
 
+    public const PER_PAGE = 2;
+
 	/**
 	 * The attributes that are mass assignable.
 	 *
@@ -59,6 +61,9 @@ class TodoList extends Model
 		return ($this->image) ? Storage::url("images/thumbnail/{$this->image}") : null;
 	}
 
+	/**
+	 * @return BelongsTo
+	 */
 	public function access(): BelongsTo
 	{
 		return $this->belongsTo(Access::class, 'id', 'todo_list_id');
