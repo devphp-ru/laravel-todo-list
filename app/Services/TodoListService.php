@@ -93,9 +93,7 @@ class TodoListService implements Service
 		$item = new TodoList();
 		$result = $item->create($request->only($item->getFillable()));
 
-		if (!empty($request->tags)) {
-			$this->makeTags($request->tags, $result->id);
-		}
+		$this->makeTags($request, $result);
 
 		return $result;
 	}
@@ -116,11 +114,7 @@ class TodoListService implements Service
 
 		$todoList->update($request->only($todoList->getFillable()));
 
-		DB::table('tag_todo_list')->where('todo_list_id', $todoList->id)->delete();
-
-		if (!empty($request->tags)) {
-			$this->makeTags($request->tags, $todoList->id);
-		}
+		$this->makeTags($request, $todoList);
 
 		return $todoList;
 	}
@@ -147,24 +141,24 @@ class TodoListService implements Service
 	/**
 	 * Сохранить теги и привязать к делу
 	 *
-	 * @param array $arrayTags
-	 * @param int $todoId
+	 * @param FormRequest $request
+	 * @param TodoList $item
 	 */
-	private function makeTags(array $arrayTags, int $todoId): void
+	private function makeTags(FormRequest $request, TodoList $item): void
 	{
-		foreach ($arrayTags as $value) {
-			if (is_numeric($value)) {
-				$tag = Tag::select('id')->where('id', $value)->first();
-			} else {
-				$tag = Tag::create(['name' => $value]);
-			}
+		$result = [];
 
-			DB::table('tag_todo_list')
-				->insert([
-					'tag_id' => $tag->id,
-					'todo_list_id' => $todoId,
-				]);
+		if ($request->tags) {
+			foreach ($request->tags as $value) {
+				if (is_numeric($value)) {
+					$result[] = Tag::where('id', $value)->value('id');
+				} else {
+					$result[] = Tag::create(['name' => $value])->id;
+				}
+			}
 		}
+
+		$item->tags()->sync($result);
 	}
 
 	/**
