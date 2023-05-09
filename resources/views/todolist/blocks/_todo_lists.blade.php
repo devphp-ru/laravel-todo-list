@@ -54,5 +54,6 @@
     </tbody>
 </table>
 <div class="pagination">
+    @php $paginator->withPath('todo-lists') @endphp
     {{ $paginator->links('vendor.pagination.bootstrap-4') }}
 </div>
