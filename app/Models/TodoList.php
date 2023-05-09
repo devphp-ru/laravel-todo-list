@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Class TodoList
+ * @package App\Models
+ * @mixin Builder
+ */
 class TodoList extends Model
 {
     use HasFactory;
@@ -26,6 +32,8 @@ class TodoList extends Model
 	];
 
 	/**
+	 * Получить все теги
+	 *
 	 * @return BelongsToMany
 	 */
 	public function tags(): BelongsToMany
@@ -34,11 +42,23 @@ class TodoList extends Model
 	}
 
 	/**
+	 * Получить пользователя
+	 *
 	 * @return BelongsTo
 	 */
 	public function user(): BelongsTo
 	{
 		return $this->belongsTo(User::class);
+	}
+
+	/**
+	 * Получить доступ к делу
+	 *
+	 * @return BelongsTo
+	 */
+	public function access(): BelongsTo
+	{
+		return $this->belongsTo(Access::class, 'id', 'todo_list_id');
 	}
 
 	/**
@@ -59,13 +79,5 @@ class TodoList extends Model
 	public function getMiniImage(): ?string
 	{
 		return ($this->image) ? Storage::url("images/thumbnail/{$this->image}") : null;
-	}
-
-	/**
-	 * @return BelongsTo
-	 */
-	public function access(): BelongsTo
-	{
-		return $this->belongsTo(Access::class, 'id', 'todo_list_id');
 	}
 }

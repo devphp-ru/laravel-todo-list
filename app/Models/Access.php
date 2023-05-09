@@ -2,11 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Access
+ * @package App\Models
+ * @mixin Builder
+ */
 class Access extends Model
 {
     use HasFactory;
@@ -23,15 +29,27 @@ class Access extends Model
 	];
 
 	/**
-	 * @return HasOne
+	 * Получить доступ, связанный с пользователем
+	 *
+	 * @return BelongsTo
 	 */
-	public function user(): HasOne
+	public function user(): BelongsTo
 	{
-		return $this->hasOne(User::class);
+		return $this->belongsTo(User::class);
 	}
 
 	/**
-	 * Проверить есть ли доступ к делу
+	 * Получить пользователей у которых есть доступы к делу
+	 *
+	 * @return BelongsTo
+	 */
+	public function users(): BelongsTo
+	{
+		return $this->belongsTo(User::class);
+	}
+
+	/**
+	 * Проверить есть ли доступ к делу у пользователя
 	 *
 	 * @param Request $request
 	 * @return bool

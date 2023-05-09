@@ -15,6 +15,7 @@ class CreateTagsTable extends Migration
     {
         Schema::create('tags', function (Blueprint $table) {
             $table->id()->comment('ID');
+            $table->bigInteger('user_id')->comment('ID пользователя');
             $table->string('name')->comment('название');
         });
     }

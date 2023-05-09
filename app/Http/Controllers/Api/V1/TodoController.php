@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTodoListRequest;
 use App\Http\Requests\UpdateTodoListRequest;
 use App\Http\Resources\TodoListResource;
-use App\Models\Tag;
 use App\Models\TodoList;
 use App\Services\TodoListService;
 use Illuminate\Http\JsonResponse;
@@ -16,16 +15,16 @@ use Illuminate\Http\Response;
 class TodoController extends Controller
 {
 	/** @var TodoListService  */
-	private TodoListService $service;
+	private TodoListService $todoService;
 
 	/**
 	 * TodoController constructor.
 	 *
-	 * @param TodoListService $service
+	 * @param TodoListService $todoService
 	 */
-	public function __construct(TodoListService $service)
+	public function __construct(TodoListService $todoService)
 	{
-		$this->service = $service;
+		$this->todoService = $todoService;
 	}
 
 	/**
@@ -51,11 +50,12 @@ class TodoController extends Controller
 	public function paginateAjax(Request $request): ?string
 	{
 		if ($request->ajax()) {
-			$items = $this->service->getAllWithPaginate($request, TodoList::PER_PAGE, $request->input('current_user_id'));
+			$userId = $request->input('current_user_id');
+			$items = $this->todoService->getAllWithPaginate($request, TodoList::PER_PAGE, $userId);
 
 			return view('todolist.blocks._todo_lists', [
 				'paginator' => $items,
-				'userId' => $request->input('current_user_id'),
+				'userId' => $userId,
 			])->render();
 		}
 
@@ -70,13 +70,14 @@ class TodoController extends Controller
 	 */
 	public function store(StoreTodoListRequest $request): string
 	{
-		$this->service->create($request);
+		$this->todoService->create($request);
 
-		$items = $this->service->getAllWithPaginate($request, TodoList::PER_PAGE, $request->input('current_user_id'));
+		$userId = $request->input('current_user_id');
+		$items = $this->todoService->getAllWithPaginate($request, TodoList::PER_PAGE, $userId);
 
 		return view('todolist.blocks._todo_lists', [
 			'paginator' => $items,
-			'userId' => $request->input('current_user_id'),
+			'userId' => $userId,
 		])->render();
 	}
 
@@ -89,13 +90,14 @@ class TodoController extends Controller
 	 */
 	public function edit(UpdateTodoListRequest $request, TodoList $todoList): string
 	{
-		$this->service->update($request, $todoList);
+		$this->todoService->update($request, $todoList);
 
-		$items = $this->service->getAllWithPaginate($request, TodoList::PER_PAGE, $request->input('current_user_id'));
+		$userId = $request->input('current_user_id');
+		$items = $this->todoService->getAllWithPaginate($request, TodoList::PER_PAGE, $userId);
 
 		return view('todolist.blocks._todo_lists', [
 			'paginator' => $items,
-			'userId' => $request->input('current_user_id'),
+			'userId' => $userId,
 		])->render();
 	}
 
@@ -108,7 +110,7 @@ class TodoController extends Controller
 	 */
 	public function destroy(Request $request, TodoList $todoList): JsonResponse|string
 	{
-		$result = $this->service->destroy($todoList);
+		$result = $this->todoService->destroy($todoList);
 
 		if (!$result) {
 			return response()->json([
@@ -116,11 +118,12 @@ class TodoController extends Controller
 			])->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
 		}
 
-		$items = $this->service->getAllWithPaginate($request, TodoList::PER_PAGE, $request->input('current_user_id'));
+		$userId = $request->input('current_user_id');
+		$items = $this->todoService->getAllWithPaginate($request, TodoList::PER_PAGE, $userId);
 
 		return view('todolist.blocks._todo_lists', [
 			'paginator' => $items,
-			'userId' => $request->input('current_user_id'),
+			'userId' => $userId,
 		])->render();
 	}
 
@@ -132,29 +135,8 @@ class TodoController extends Controller
 	 */
 	public function removeImage(TodoList $todoList): JsonResponse
 	{
-		$result = $this->service->removeImage($todoList);
-
-		if (!$result) {
-			return response()->json([
-				'status' => false,
-			])->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
-		}
-
 		return response()->json([
-			'status' => true,
-		])->setSTatusCode(Response::HTTP_NO_CONTENT);
-	}
-
-	/**
-	 * Получить все теги из хранилища
-	 *
-	 * @return JsonResponse
-	 */
-	public function tags(): JsonResponse
-	{
-		return response()->json([
-			'status' => true,
-			'tags' => Tag::getAll(),
+			'status' => $this->todoService->removeImage($todoList),
 		])->setStatusCode(Response::HTTP_OK);
 	}
 }

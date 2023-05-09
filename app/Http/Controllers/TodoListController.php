@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\TodoList;
+use App\Services\TagService;
 use App\Services\TodoListService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -11,16 +13,29 @@ use Illuminate\View\View;
 class TodoListController extends Controller
 {
 	/** @var TodoListService  */
-	private TodoListService $service;
+	private TodoListService $todoService;
+
+	/** @var TagService  */
+	private TagService $tagService;
+
+	/** @var UserService  */
+	private UserService $userService;
 
 	/**
 	 * TodoListController constructor.
 	 *
-	 * @param TodoListService $service
+	 * @param TodoListService $todoService
+	 * @param TagService $tagService
+	 * @param UserService $userService
 	 */
-	public function __construct(TodoListService $service)
-	{
-		$this->service = $service;
+	public function __construct(
+		TodoListService $todoService,
+		TagService $tagService,
+		UserService $userService
+	) {
+		$this->todoService = $todoService;
+		$this->tagService = $tagService;
+		$this->userService = $userService;
 	}
 
 	/**
@@ -31,8 +46,11 @@ class TodoListController extends Controller
 	 */
     public function index(Request $request): View
 	{
-		$items = $this->service->getAllWithPaginate($request, TodoList::PER_PAGE, Auth::user()->id);
-		$users = $this->service->getUsersExceptId(Auth::user()->id);
+		$userId = Auth::user()->id;
+
+		$items = $this->todoService->getAllWithPaginate($request, TodoList::PER_PAGE, $userId);
+		$users = $this->userService->getUsersExceptId($userId);
+		$tags = $this->tagService->getForFilter();
 
 		$title = 'Список дел';
 
@@ -40,7 +58,8 @@ class TodoListController extends Controller
 			'title' => $title,
 			'paginator' => $items,
 			'users' => $users,
-			'userId' => Auth::user()->id,
+			'tags' => $tags,
+			'userId' => $userId,
 		]);
 	}
 }

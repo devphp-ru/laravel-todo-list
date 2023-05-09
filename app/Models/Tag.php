@@ -2,10 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 
+/**
+ * Class Tag
+ * @package App\Models
+ * @mixin Builder
+ */
 class Tag extends Model
 {
     use HasFactory;
@@ -16,6 +21,7 @@ class Tag extends Model
 	 * @var array<int, string>
 	 */
 	protected $fillable = [
+		'user_id',
 		'name',
 	];
 
@@ -27,12 +33,31 @@ class Tag extends Model
 	public $timestamps = false;
 
 	/**
-	 * Получить все теги
+	 * Проверить существует ли тег
 	 *
-	 * @return Collection
+	 * @param int $userId
+	 * @param string $value
+	 * @return bool
 	 */
-	public static function getAll(): Collection
+	public static function isExists(int $userId, string $value): bool
 	{
-		return self::orderBy('id')->get()->pluck('name', 'id');
+		return self::where('user_id', $userId)->where(function ($query) use ($value) {
+			$query->orWhere('id', $value)->orWhere('name', $value);
+		})->exists();
+	}
+
+	/**
+	 * Сохарнить новую модель в хранилище
+	 *
+	 * @param int $userId
+	 * @param string $value
+	 * @return int
+	 */
+	public static function newSave(int $userId, string $value): int
+	{
+		return Tag::create([
+			'user_id' => $userId,
+			'name' => $value,
+		])->id;
 	}
 }

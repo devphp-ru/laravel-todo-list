@@ -1,4 +1,15 @@
 @charset "utf-8";
+.an_tag-link{
+    border: 1px solid #ccc;
+    padding: 5px;
+    cursor: pointer;
+}
+.an_tag-link:hover{
+    border: 1px solid #5897fb;
+}
+.an_btn-reset-hidden{
+    display: none;
+}
 /* Список c превью */
 .input-file-list {
     padding: 10px 0;
@@ -36,7 +47,6 @@
     line-height: 16px;
     border-radius: 50%;
 }
-
 .block-images {
     position: relative;
 }

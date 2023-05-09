@@ -16,11 +16,11 @@
                     <div class="block-images">
                         <div class="overlay" id="contenedor{{ $value->id }}">
                             <div class="overlay_container">
-                                <a href="#close"><img src="{{ $value->getImage() }}"/></a>
+                                <a href="#close"><img src="{{ $value->getImage() }}" alt="..."></a>
                             </div>
                         </div>
                         <a href="#contenedor{{ $value->id }}">
-                            <img src="{{ $value->getMiniImage() }}" id="image{{ $value->id }}" />
+                            <img src="{{ $value->getMiniImage() }}" id="image{{ $value->id }}" alt="...">
                         </a>
                     </div>
                 </td>
@@ -37,13 +37,13 @@
                 </td>
                 <td>
                     @if (!$value->access()->where('user_id', $userId)->exists())
-                    <button data-id="{{ $value->id }}" data-user-id="{{ $userId }}" type="button" class="btn btn-primary an_open-modal" data-bs-toggle="modal" data-bs-target="#an_modal-todo">
+                    <button data-id="{{ $value->id }}" data-user-id="{{ $userId }}" type="button" class="btn btn-primary an_open-modal-edit" data-bs-toggle="modal" data-bs-target="#an_modal-todo">
                         Редактировать
                     </button>
                     <button data-id="{{ $value->id }}" type="button" class="btn btn-primary an_open-modal-access" data-bs-toggle="modal" data-bs-target="#an_modal-access">Доступ</button>
                     <button data-id="{{ $value->id }}" type="button" class="btn btn-danger an_remove-todo">Удалить</button>
                     @elseif ($value->access()->where('user_id', $userId)->exists() && $value->access->action === 2)
-                        <button data-id="{{ $value->id }}" data-user-id="{{ $value->user->id }}" type="button" class="btn btn-primary an_open-modal" data-bs-toggle="modal" data-bs-target="#an_modal-todo">
+                        <button data-id="{{ $value->id }}" data-user-id="{{ $value->user->id }}" type="button" class="btn btn-primary an_open-modal-edit" data-bs-toggle="modal" data-bs-target="#an_modal-todo">
                             Редактировать
                         </button>
                     @endif

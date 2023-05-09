@@ -7,17 +7,28 @@ use App\Http\Requests\UpdateTodoListRequest;
 use App\Models\Access;
 use App\Models\Tag;
 use App\Models\TodoList;
-use App\Models\User;
 use App\Services\Contracts\Service;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 class TodoListService implements Service
 {
+	/** @var TodoList  */
+	private TodoList $item;
+
+	/**
+	 * AccessService constructor.
+	 *
+	 * @param TodoList $todoList
+	 */
+	public function __construct(TodoList $todoList)
+	{
+		$this->item = $todoList;
+	}
+
 	/**
 	 * Получить дела с разбивкой на страницы
 	 *
@@ -28,7 +39,9 @@ class TodoListService implements Service
 	 */
 	public function getAllWithPaginate(Request $request, int $perPage, int $userId): LengthAwarePaginator
 	{
-		$builder = TodoList::with('tags', 'user', 'access');
+		$request->query->remove('current_user_id');
+
+		$builder = $this->item->with('tags', 'user', 'access');
 		$builder = $this->search($request, $builder);
 		$builder->where('user_id', $userId);
 
@@ -63,6 +76,13 @@ class TodoListService implements Service
 			$builder->where('text', 'LIKE', $q);
 		}
 
+		if ($request->filled('filter')) {
+			$tagIds = explode('_', $request->input('filter'));
+			$builder->whereIn('id', function ($query) use ($tagIds) {
+				$query->select('todo_list_id')->from('tag_todo_list')->whereIn('tag_id', $tagIds)->get();
+			});
+		}
+
 		return $builder;
 	}
 
@@ -81,7 +101,7 @@ class TodoListService implements Service
 	}
 
 	/**
-	 * Создать модель в хранишище
+	 * Создать модель в хранилище
 	 *
 	 * @param FormRequest $request
 	 * @return TodoList|null
@@ -90,8 +110,7 @@ class TodoListService implements Service
 	{
 		$request->offsetSet('image', Uploader::upload($request));
 
-		$item = new TodoList();
-		$result = $item->create($request->only($item->getFillable()));
+		$result = $this->item->create($request->only($this->item->getFillable()));
 
 		$this->makeTags($request, $result);
 
@@ -130,8 +149,8 @@ class TodoListService implements Service
 		$result = $item->delete();
 
 		if ($result) {
-			DB::table('tag_todo_list')->where('todo_list_id', $item->id)->delete();
-			Access::where('todo_list_id', $item->id)->delete();
+			$item->tags()->sync([]);
+			$item->access()->delete();
 			Uploader::remove($item);
 		}
 
@@ -149,11 +168,13 @@ class TodoListService implements Service
 		$result = [];
 
 		if ($request->tags) {
+			$userId = $request->input('current_user_id');
+
 			foreach ($request->tags as $value) {
-				if (is_numeric($value)) {
-					$result[] = Tag::where('id', $value)->value('id');
+				if (Tag::isExists($userId, $value)) {
+					$result[] = $value;
 				} else {
-					$result[] = Tag::create(['name' => $value])->id;
+					$result[] = Tag::newSave($userId, $value);
 				}
 			}
 		}
@@ -172,16 +193,5 @@ class TodoListService implements Service
 		Uploader::remove($item);
 
 		return $item->update(['image' => null]);
-	}
-
-	/**
-	 * Получить пользователей, кроме id
-	 *
-	 * @param int $id
-	 * @return Collection
-	 */
-	public function getUsersExceptId(int $id): Collection
-	{
-		return User::getExceptId($id);
 	}
 }

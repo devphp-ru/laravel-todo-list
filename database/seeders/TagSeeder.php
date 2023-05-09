@@ -2,12 +2,8 @@
 
 namespace Database\Seeders;
 
-use Faker\Generator;
-use Illuminate\Container\Container;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class TagSeeder extends Seeder
 {
@@ -20,10 +16,13 @@ class TagSeeder extends Seeder
     {
 		$items = [];
 
-		for ($i = 1; $i <= 3; $i++) {
-			$items[] = [
-				'name' => 'Тег ' . $i,
-			];
+		for ($i = 1; $i <= 2; $i++) {
+			for ($j = 1; $j <= 3; $j++) {
+				$items[] = [
+					'user_id' => $i,
+					'name' => 'Тег ' . $j,
+				];
+			}
 		}
 
 		DB::table('tags')->insert($items);
